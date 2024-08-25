@@ -1,0 +1,18 @@
+{
+    "name": "@ixveria/environment",
+    "version": "0.0.0",
+    "scripts": {
+        "typecheck": "tsc --noEmit"
+    },
+    "dependencies": {
+        "@t3-oss/env-core": "^0.11.0",
+        "zod": "^3.23.8"
+    },
+    "devDependencies": {
+        "@ixveria/typescript": "workspace:*",
+        "typescript": "^5"
+    },
+    "exports": {
+        ".": "./env.ts"
+    }
+}
