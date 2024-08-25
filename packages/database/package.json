@@ -1,0 +1,26 @@
+{
+    "name": "@ixveria/database",
+    "version": "0.0.0",
+    "scripts": {
+        "db:push": "bun --env-file ../../.env drizzle-kit push",
+        "db:studio": "bun --env-file ../../.env drizzle-kit studio",
+        "db:generate": "bun --env-file ../../.env drizzle-kit generate",
+        "db:migrate": "bun --env-file ../../.env drizzle-kit migrate",
+        "typecheck": "tsc --noEmit"
+    },
+    "dependencies": {
+        "@ixveria/environment": "workspace:*",
+        "drizzle-orm": "^0.33.0",
+        "postgres": "^3.4.4"
+    },
+    "devDependencies": {
+        "@ixveria/typescript": "workspace:*",
+        "drizzle-kit": "^0.24.0",
+        "@types/bun": "latest",
+        "typescript": "^5"
+    },
+    "exports": {
+        ".": "./src/drizzle.ts",
+        "./schema": "./src/schema.ts"
+    }
+}
