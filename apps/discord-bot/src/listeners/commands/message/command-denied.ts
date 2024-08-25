@@ -11,13 +11,16 @@ export class MessageCommandDeniedListener extends Listener {
     }
 
     public async run(error: UserError, payload: MessageCommandDeniedPayload) {
-        const { logger } = this.container;
+        const { logger, services } = this.container;
         const { message } = payload;
 
         logger.debug(`MessageCommandDeniedListener: ${error.identifier}`);
 
+        const response: string = services.response.generateDeniedResponse(error);
+
         return message.reply({
-            content: `${error.identifier}\n${error.message}`,
+            content: response,
+            allowedMentions: { users: [message.author.id], roles: [] },
         });
     }
 }

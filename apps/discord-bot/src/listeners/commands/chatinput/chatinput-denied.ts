@@ -11,13 +11,24 @@ export class ChatInputCommadDeniedListener extends Listener {
     }
 
     public async run(error: UserError, payload: ChatInputCommandDeniedPayload) {
-        const { logger } = this.container;
+        const { logger, services } = this.container;
         const { interaction } = payload;
 
         logger.debug(`ChatInputCommadDeniedListener: ${error.identifier}`);
 
+        const response: string = services.response.generateDeniedResponse(error);
+
+        if (interaction.deferred || interaction.replied) {
+            return interaction.editReply({
+                content: response,
+                allowedMentions: { users: [interaction.user.id], roles: [] },
+            });
+        }
+
         return interaction.reply({
-            content: `${error.identifier}\n${error.message}`,
+            content: response,
+            allowedMentions: { users: [interaction.user.id], roles: [] },
+            ephemeral: true,
         });
     }
 }
