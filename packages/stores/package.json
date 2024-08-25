@@ -16,6 +16,7 @@
     },
     "exports": {
         "./service": "./src/services/service.ts",
+        "./utility": "./src/utilities/utility.ts",
         "./register": "./src/register.ts"
     }
 }

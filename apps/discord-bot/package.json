@@ -31,6 +31,7 @@
     },
     "imports": {
         "#lib/*": "./src/lib/*.ts",
-        "#services/*": "./src/services/*.ts"
+        "#services/*": "./src/services/*.ts",
+        "#utilities/*": "./src/utilities/*.ts"
     }
 }
