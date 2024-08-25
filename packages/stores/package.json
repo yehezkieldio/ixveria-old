@@ -15,7 +15,7 @@
         "typescript": "^5"
     },
     "exports": {
-        ".": "./src/index.ts",
+        "./service": "./src/services/service.ts",
         "./register": "./src/register.ts"
     }
 }
