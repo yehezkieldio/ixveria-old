@@ -15,3 +15,9 @@ declare module "@sapphire/pieces" {
         utilities: Utilities;
     }
 }
+
+declare module "@sapphire/framework" {
+    interface Preconditions {
+        DeveloperUserOnly: never;
+    }
+}
