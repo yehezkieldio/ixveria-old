@@ -1,13 +1,13 @@
 import { Precondition, type Result, type UserError } from "@sapphire/framework";
 import type { CommandInteraction, Message } from "discord.js";
 import { DEVELOPERS } from "#lib/configuration";
-import { ImperiaIdentifiers } from "#lib/extensions/constants/identifiers";
+import { IxveriaIdentifiers } from "#lib/extensions/constants/identifiers";
 
 export class DeveloperOnlyPrecondition extends Precondition {
     public constructor(context: Precondition.LoaderContext, options: Precondition.Options) {
         super(context, {
             ...options,
-            name: ImperiaIdentifiers.DeveloperUserOnly,
+            name: IxveriaIdentifiers.DeveloperUserOnly,
         });
     }
 
@@ -24,7 +24,7 @@ export class DeveloperOnlyPrecondition extends Precondition {
             ? this.ok()
             : this.error({
                   message: "This command is restricted to developers only!",
-                  identifier: ImperiaIdentifiers.DeveloperUserOnly,
+                  identifier: IxveriaIdentifiers.DeveloperUserOnly,
               });
     }
 }

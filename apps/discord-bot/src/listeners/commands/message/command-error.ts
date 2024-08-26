@@ -1,12 +1,12 @@
 import { Listener, type MessageCommandErrorPayload, type UserError } from "@sapphire/framework";
-import { ImperiaEvents } from "#lib/extensions/constants/events";
+import { IxveriaEvents } from "#lib/extensions/constants/events";
 
 export class MessageCommandErrorListener extends Listener {
     public constructor(context: Listener.LoaderContext, options: Listener.Options) {
         super(context, {
             ...options,
             once: false,
-            event: ImperiaEvents.MessageCommandError,
+            event: IxveriaEvents.MessageCommandError,
         });
     }
 

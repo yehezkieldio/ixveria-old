@@ -1,7 +1,7 @@
 import { EmbedBuilder } from "discord.js";
 import { Colors } from "#lib/colors";
 
-export class ImperiaEmbedBuilder extends EmbedBuilder {
+export class IxveriaEmbedBuilder extends EmbedBuilder {
     public constructor() {
         super();
         this.setColor(Colors.primary);

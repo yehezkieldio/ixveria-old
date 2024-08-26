@@ -1,7 +1,7 @@
 import { sql } from "drizzle-orm";
 import { type PgTableFn, pgTable, pgTableCreator, text, uniqueIndex, uuid, varchar } from "drizzle-orm/pg-core";
 
-export const createTable: PgTableFn = pgTableCreator((name: string): string => `imperia_${name}`);
+export const createTable: PgTableFn = pgTableCreator((name: string): string => `Ixveria_${name}`);
 
 /* ---------------------------------- USER ---------------------------------- */
 

@@ -1,14 +1,14 @@
 import { Subcommand, type SubcommandOptions } from "@sapphire/plugin-subcommands";
 import type { ChatMessageContext } from "#lib/typings/message-type";
 
-interface ImperiaSubcommandOptions extends SubcommandOptions {
+interface IxveriaSubcommandOptions extends SubcommandOptions {
     tags: string[];
 }
 
-export abstract class ImperiaSubcommand extends Subcommand {
+export abstract class IxveriaSubcommand extends Subcommand {
     public tags: string[];
 
-    protected constructor(context: Subcommand.LoaderContext, options: ImperiaSubcommandOptions) {
+    protected constructor(context: Subcommand.LoaderContext, options: IxveriaSubcommandOptions) {
         super(context, {
             ...options,
         });
@@ -17,8 +17,8 @@ export abstract class ImperiaSubcommand extends Subcommand {
     }
 }
 
-export declare namespace ImperiaSubcommand {
-    type Options = ImperiaSubcommandOptions;
+export declare namespace IxveriaSubcommand {
+    type Options = IxveriaSubcommandOptions;
     type JSON = Subcommand.JSON;
     type Context = Subcommand.LoaderContext;
     type RunInTypes = Subcommand.RunInTypes;

@@ -1,6 +1,6 @@
 import { Service } from "@ixveria/stores/service";
 import type { UserError } from "@sapphire/framework";
-import { ImperiaIdentifiers } from "#lib/extensions/constants/identifiers";
+import { IxveriaIdentifiers } from "#lib/extensions/constants/identifiers";
 
 export class ResponseService extends Service {
     public constructor(context: Service.LoaderContext, options: Service.Options) {
@@ -20,44 +20,44 @@ export class ResponseService extends Service {
 
         /* -------------------------- GLOBAL PRECONDITIONS -------------------------- */
 
-        if (error.identifier === ImperiaIdentifiers.UserBlacklisted) {
+        if (error.identifier === IxveriaIdentifiers.UserBlacklisted) {
             return error.message;
         }
 
-        if (error.identifier === ImperiaIdentifiers.ServerBlacklisted) {
+        if (error.identifier === IxveriaIdentifiers.ServerBlacklisted) {
             return error.message;
         }
 
         /* -------------------------- GENERAL PRECONDITIONS -------------------------- */
 
-        if (error.identifier === ImperiaIdentifiers.InvalidArgumentProvided) {
+        if (error.identifier === IxveriaIdentifiers.InvalidArgumentProvided) {
             return error.message;
         }
 
-        if (error.identifier === ImperiaIdentifiers.CommandDisabled) {
+        if (error.identifier === IxveriaIdentifiers.CommandDisabled) {
             return "This command is globally disabled! Please try again later...";
         }
 
-        if (error.identifier === ImperiaIdentifiers.PreconditionCooldown) {
+        if (error.identifier === IxveriaIdentifiers.PreconditionCooldown) {
             return "This command is on cooldown! Please wait for the cooldown to expire...";
         }
 
-        if (error.identifier === ImperiaIdentifiers.PreconditionRunIn) {
+        if (error.identifier === IxveriaIdentifiers.PreconditionRunIn) {
             return `This command is not available in this context! Please use this command in a ${getChannelType(error)}`;
         }
 
         /* ------------------------ PERMISSION PRECONDITIONS ------------------------ */
 
         if (
-            error.identifier === ImperiaIdentifiers.PreconditionClientPermissions ||
-            error.identifier === ImperiaIdentifiers.PreconditionClientPermissionsNoPermissions
+            error.identifier === IxveriaIdentifiers.PreconditionClientPermissions ||
+            error.identifier === IxveriaIdentifiers.PreconditionClientPermissionsNoPermissions
         ) {
             return `I am missing required permissions to execute this command!\nRequired permission(s): ${getMissingPermissions(error)}`;
         }
 
         if (
-            error.identifier === ImperiaIdentifiers.PreconditionUserPermissions ||
-            error.identifier === ImperiaIdentifiers.PreconditionUserPermissionsNoPermissions
+            error.identifier === IxveriaIdentifiers.PreconditionUserPermissions ||
+            error.identifier === IxveriaIdentifiers.PreconditionUserPermissionsNoPermissions
         ) {
             return `You are missing required permissions to execute this command!\nRequired permission(s): ${getMissingPermissions(error)}`;
         }

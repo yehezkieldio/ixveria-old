@@ -13,7 +13,7 @@ enum Identifiers {
     CommandServiceError = "commandServiceError",
 }
 
-export const ImperiaIdentifiers = {
+export const IxveriaIdentifiers = {
     ...SapphireIdentifiers,
     ...SubcommandPluginIdentifiers,
     ...Identifiers,

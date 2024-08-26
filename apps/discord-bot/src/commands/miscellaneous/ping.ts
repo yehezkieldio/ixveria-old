@@ -1,10 +1,10 @@
 import { isMessageInstance } from "@sapphire/discord.js-utilities";
 import { CommandOptionsRunTypeEnum } from "@sapphire/framework";
 import { type Message, SlashCommandBuilder } from "discord.js";
-import { ImperiaCommand } from "#lib/extensions/command";
+import { IxveriaCommand } from "#lib/extensions/command";
 
-export class PingCommand extends ImperiaCommand {
-    public constructor(context: ImperiaCommand.LoaderContext, options: ImperiaCommand.Options) {
+export class PingCommand extends IxveriaCommand {
+    public constructor(context: IxveriaCommand.LoaderContext, options: IxveriaCommand.Options) {
         super(context, {
             ...options,
             description: "Check the bot's latency.",
@@ -13,7 +13,7 @@ export class PingCommand extends ImperiaCommand {
         });
     }
 
-    public override registerApplicationCommands(registry: ImperiaCommand.Registry): void {
+    public override registerApplicationCommands(registry: IxveriaCommand.Registry): void {
         const command = new SlashCommandBuilder().setName(this.name).setDescription(this.description);
 
         void registry.registerChatInputCommand(command);
@@ -22,14 +22,14 @@ export class PingCommand extends ImperiaCommand {
     #pleaseWait = "Please wait...";
     #failed = "Failed to retrieve ping latency.";
 
-    public async chatInputRun(interaction: ImperiaCommand.ChatInputCommandInteraction) {
+    public async chatInputRun(interaction: IxveriaCommand.ChatInputCommandInteraction) {
         const msg: Message = await interaction.reply({
             content: this.#pleaseWait,
             fetchReply: true,
         });
 
         if (isMessageInstance(msg)) {
-            const context: ImperiaCommand.MessageContext = msg;
+            const context: IxveriaCommand.MessageContext = msg;
             const response: string = await this.getLatency(msg, context);
 
             return msg.edit(response);
@@ -42,7 +42,7 @@ export class PingCommand extends ImperiaCommand {
         const msg: Message = await message.reply(this.#pleaseWait);
 
         if (isMessageInstance(msg)) {
-            const context: ImperiaCommand.MessageContext = msg;
+            const context: IxveriaCommand.MessageContext = msg;
             const response: string = await this.getLatency(msg, context);
 
             return msg.edit(response);
@@ -51,7 +51,7 @@ export class PingCommand extends ImperiaCommand {
         return message.edit(this.#failed);
     }
 
-    private async getLatency(message: Message, context: ImperiaCommand.MessageContext) {
+    private async getLatency(message: Message, context: IxveriaCommand.MessageContext) {
         const diff: number = message.createdTimestamp - context.createdTimestamp;
         const ping: number = Math.round(this.container.client.ws.ping);
 

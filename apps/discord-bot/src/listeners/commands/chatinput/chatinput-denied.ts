@@ -1,12 +1,12 @@
 import { type ChatInputCommandDeniedPayload, Listener, type UserError } from "@sapphire/framework";
-import { ImperiaEvents } from "#lib/extensions/constants/events";
+import { IxveriaEvents } from "#lib/extensions/constants/events";
 
 export class ChatInputCommadDeniedListener extends Listener {
     public constructor(context: Listener.LoaderContext, options: Listener.Options) {
         super(context, {
             ...options,
             once: false,
-            event: ImperiaEvents.ChatInputCommandDenied,
+            event: IxveriaEvents.ChatInputCommandDenied,
         });
     }
 

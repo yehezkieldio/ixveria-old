@@ -7,6 +7,6 @@ export default {
     dbCredentials: {
         url: env.DATABASE_URL,
     },
-    tablesFilter: ["imperia_*"],
+    tablesFilter: ["Ixveria_*"],
     out: "./migrations",
 } satisfies Config;

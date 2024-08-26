@@ -7,19 +7,19 @@ import {
 } from "@sapphire/framework";
 import type { ClientOptions } from "discord.js";
 
-export interface ImperiaClientOptions extends SapphireClientOptions, ClientOptions {
+export interface IxveriaClientOptions extends SapphireClientOptions, ClientOptions {
     overrideApplicationCommandsRegistries?: boolean;
 }
 
-export class ImperiaClient extends SapphireClient {
-    public constructor(options: ImperiaClientOptions) {
+export class IxveriaClient extends SapphireClient {
+    public constructor(options: IxveriaClientOptions) {
         super(options);
 
-        container.logger.info(`ImperiaClient: Running on a ${Bun.env.NODE_ENV} environment.`);
+        container.logger.info(`IxveriaClient: Running on a ${Bun.env.NODE_ENV} environment.`);
 
         if (options.overrideApplicationCommandsRegistries === true) {
             container.logger.info(
-                "ImperiaClient: Overriding the default behavior for application commands registries to BulkOverwrite.",
+                "IxveriaClient: Overriding the default behavior for application commands registries to BulkOverwrite.",
             );
 
             ApplicationCommandRegistries.setDefaultBehaviorWhenNotIdentical(RegisterBehavior.BulkOverwrite);
@@ -27,7 +27,7 @@ export class ImperiaClient extends SapphireClient {
     }
 
     public override async login(token: string): Promise<string> {
-        container.logger.info("ImperiaClient: Logging in...");
+        container.logger.info("IxveriaClient: Logging in...");
         return super.login(token);
     }
 
