@@ -178,7 +178,7 @@ dist
 
 # Docker Compose
 
-docker/infrastructure/postgresql
+docker/development/data
 
 # Turbo
 
