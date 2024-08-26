@@ -22,6 +22,8 @@ export class PingCommand extends IxveriaCommand {
     #pleaseWait = "Please wait...";
     #failed = "Failed to retrieve ping latency.";
 
+    /* -------------------------------------------------------------------------- */
+
     public async chatInputRun(interaction: IxveriaCommand.ChatInputCommandInteraction) {
         const msg: Message = await interaction.reply({
             content: this.#pleaseWait,
@@ -50,6 +52,8 @@ export class PingCommand extends IxveriaCommand {
 
         return message.edit(this.#failed);
     }
+
+    /* -------------------------------------------------------------------------- */
 
     private async getLatency(message: Message, context: IxveriaCommand.MessageContext) {
         const diff: number = message.createdTimestamp - context.createdTimestamp;
