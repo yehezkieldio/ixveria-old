@@ -67,7 +67,7 @@ export class BanCommand extends IxveriaCommand {
         const user: User = interaction.options.getUser("user", true);
         const reason: string = interaction.options.getString("reason") ?? this.#defaultReason;
         const silent: boolean = interaction.options.getBoolean("silent") ?? false;
-        const deleteMessage: string = interaction.options.getString("delete_message") ?? "7d";
+        const deleteMessage: string = interaction.options.getString("delete_message") ?? "0";
 
         const parsedTime = chrono.parseDate(deleteMessage);
         const time = dayjs(parsedTime);
@@ -121,6 +121,14 @@ export class BanCommand extends IxveriaCommand {
             reason = reasonArgument.unwrap();
         }
 
+        const secondsArgument: ResultType<number> = await args.restResult("naturalDate");
+        let seconds: number;
+        if (secondsArgument.isErr()) {
+            seconds = 0;
+        } else {
+            seconds = secondsArgument.unwrap();
+        }
+
         const silentArgument: ResultType<boolean> = await args.restResult("boolean");
         let silent: boolean;
         if (reasonArgument.isErr()) {
@@ -144,6 +152,7 @@ export class BanCommand extends IxveriaCommand {
             targetUser: target,
             reason: reason,
             silent: silent,
+            deleteMessageSeconds: seconds,
         });
 
         return message.reply(response);

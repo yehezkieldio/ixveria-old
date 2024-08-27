@@ -21,6 +21,11 @@ declare module "@sapphire/pieces" {
 }
 
 declare module "@sapphire/framework" {
+    interface ArgType {
+        naturalDate: number;
+        guild: Guild;
+    }
+
     interface Preconditions {
         DeveloperUserOnly: never;
     }
