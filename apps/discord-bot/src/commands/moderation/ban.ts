@@ -1,5 +1,7 @@
 import { type Args, CommandOptionsRunTypeEnum, type ResultType } from "@sapphire/framework";
 import { UserError } from "@sapphire/framework";
+import * as chrono from "chrono-node";
+import dayjs from "dayjs";
 import {
     type Guild,
     type GuildMember,
@@ -11,7 +13,7 @@ import {
 import { IxveriaCommand } from "#lib/extensions/command";
 import { IxveriaIdentifiers } from "#lib/extensions/constants/identifiers";
 import { IxveriaEmbedBuilder } from "#lib/extensions/embed-builder";
-import type { ModerationActionContext } from "#services/moderation";
+import type { BanActionContext, ModerationActionContext } from "#services/moderation";
 
 export class BanCommand extends IxveriaCommand {
     public constructor(context: IxveriaCommand.LoaderContext, options: IxveriaCommand.Options) {
@@ -38,6 +40,12 @@ export class BanCommand extends IxveriaCommand {
                     .setDescription("The reason for banning the user from the server.")
                     .setRequired(false),
             )
+            .addStringOption((option) =>
+                option
+                    .setName("delete_message")
+                    .setDescription("The arbitrary time interval to delete the message, i.e. 7 days, 18h, etc.")
+                    .setRequired(false),
+            )
             .addBooleanOption((option) =>
                 option
                     .setName("silent")
@@ -59,6 +67,18 @@ export class BanCommand extends IxveriaCommand {
         const user: User = interaction.options.getUser("user", true);
         const reason: string = interaction.options.getString("reason") ?? this.#defaultReason;
         const silent: boolean = interaction.options.getBoolean("silent") ?? false;
+        const deleteMessage: string = interaction.options.getString("delete_message") ?? "7d";
+
+        const parsedTime = chrono.parseDate(deleteMessage);
+        const time = dayjs(parsedTime);
+        const seconds = time.second();
+
+        if (seconds > 604800) {
+            throw new UserError({
+                identifier: IxveriaIdentifiers.CommandServiceError,
+                message: "You cannot clear messages older than 7 days.",
+            });
+        }
 
         if (!interaction.guild) {
             throw new UserError({
@@ -75,6 +95,7 @@ export class BanCommand extends IxveriaCommand {
             targetUser: target,
             reason: reason,
             silent: silent,
+            deleteMessageSeconds: seconds,
         });
 
         return interaction.reply(response);
@@ -130,7 +151,10 @@ export class BanCommand extends IxveriaCommand {
 
     /* -------------------------------------------------------------------------- */
 
-    private async banUser(guild: Guild, context: Omit<ModerationActionContext, "targetUserId">): Promise<string> {
+    private async banUser(
+        guild: Guild,
+        context: Omit<ModerationActionContext & BanActionContext, "targetUserId">,
+    ): Promise<string> {
         const { moderation } = this.container.services;
 
         const ban = await moderation.ban(guild, context);

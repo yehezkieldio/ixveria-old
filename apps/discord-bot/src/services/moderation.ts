@@ -15,6 +15,10 @@ export interface ModerationActionContext {
     silent?: boolean;
 }
 
+export interface BanActionContext {
+    deleteMessageSeconds?: number;
+}
+
 export class ModerationService extends Service {
     public constructor(context: Service.LoaderContext, options: Service.Options) {
         super(context, {
@@ -192,10 +196,16 @@ export class ModerationService extends Service {
      * @param context The context of the action, containing the executor, target user and reason.
      * @returns Whether the ban was successful.
      */
-    public async ban(guild: Guild, context: Omit<ModerationActionContext, "targetUserId">): Promise<boolean> {
+    public async ban(
+        guild: Guild,
+        context: Omit<ModerationActionContext & BanActionContext, "targetUserId">,
+    ): Promise<boolean> {
         await this.preflightAction(guild, context, "ban");
 
-        const ban = await context.targetUser.ban({ reason: context.reason });
+        const ban = await context.targetUser.ban({
+            reason: context.reason,
+            ...(context.deleteMessageSeconds && { deleteMessageSeconds: context.deleteMessageSeconds }),
+        });
         if (ban) return true;
 
         return false;
