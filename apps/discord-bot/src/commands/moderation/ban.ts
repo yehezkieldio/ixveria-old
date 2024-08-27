@@ -66,7 +66,7 @@ export class BanCommand extends IxveriaCommand {
 
         const user: User = interaction.options.getUser("user", true);
         const reason: string = interaction.options.getString("reason") ?? this.#defaultReason;
-        const silent: boolean = interaction.options.getBoolean("silent") ?? false;
+        const isSilent: boolean = interaction.options.getBoolean("silent") ?? false;
         const deleteMessage: string = interaction.options.getString("delete_message") ?? "0";
 
         const parsedTime = chrono.parseDate(deleteMessage);
@@ -94,7 +94,7 @@ export class BanCommand extends IxveriaCommand {
             executor: executor,
             targetUser: target,
             reason: reason,
-            silent: silent,
+            silent: isSilent,
             deleteMessageSeconds: seconds,
         });
 
@@ -129,13 +129,7 @@ export class BanCommand extends IxveriaCommand {
             seconds = secondsArgument.unwrap();
         }
 
-        const silentArgument: ResultType<boolean> = await args.restResult("boolean");
-        let silent: boolean;
-        if (reasonArgument.isErr()) {
-            silent = false;
-        } else {
-            silent = silentArgument.unwrap();
-        }
+        const isSilent: boolean = args.getFlags("silent", "s");
 
         if (!message.guild) {
             throw new UserError({
@@ -151,7 +145,7 @@ export class BanCommand extends IxveriaCommand {
             executor: executor,
             targetUser: target,
             reason: reason,
-            silent: silent,
+            silent: isSilent,
             deleteMessageSeconds: seconds,
         });
 
