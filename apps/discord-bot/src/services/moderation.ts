@@ -204,7 +204,8 @@ export class ModerationService extends Service {
 
         const ban = await context.targetUser.ban({
             reason: context.reason,
-            ...(context.deleteMessageSeconds && { deleteMessageSeconds: context.deleteMessageSeconds }),
+            ...(context.deleteMessageSeconds &&
+                context.deleteMessageSeconds !== 0 && { deleteMessageSeconds: context.deleteMessageSeconds }),
         });
         if (ban) return true;
 
