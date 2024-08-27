@@ -105,7 +105,12 @@ export class KickCommand extends IxveriaCommand {
 
     private async kickUser(guild: Guild, executor: GuildMember, target: GuildMember, reason: string) {
         const { moderation } = this.container.services;
-        await moderation.kick(guild, executor, target, reason);
+
+        await moderation.kick(guild, {
+            executor: executor,
+            targetUser: target,
+            reason: reason,
+        });
 
         target.send({
             embeds: [
