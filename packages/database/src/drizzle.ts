@@ -1,7 +1,7 @@
 import { env } from "@ixveria/environment";
+import { eq } from "drizzle-orm";
 import { type PostgresJsDatabase, drizzle } from "drizzle-orm/postgres-js";
 import postgres from "postgres";
-
 import * as schema from "./schema";
 
 /**
@@ -22,3 +22,5 @@ if (Bun.env.NODE_ENV !== "production") globalForDb.connection = connection;
 export const database: PostgresJsDatabase<typeof schema> = drizzle(connection, { schema });
 
 export type Database = typeof database;
+
+export const equal = eq;

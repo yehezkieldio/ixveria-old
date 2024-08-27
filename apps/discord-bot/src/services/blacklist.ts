@@ -1,4 +1,8 @@
+import { database, equal } from "@ixveria/database";
+import { blacklistEntities } from "@ixveria/database/schema";
 import { Service } from "@ixveria/stores/service";
+
+type SelectBlacklistedEntities = typeof blacklistEntities.$inferSelect;
 
 export class BlacklistService extends Service {
     public constructor(context: Service.LoaderContext, options: Service.Options) {
@@ -6,5 +10,25 @@ export class BlacklistService extends Service {
             ...options,
             name: "blacklist",
         });
+    }
+
+    public async getServers(): Promise<SelectBlacklistedEntities[]> {
+        const servers = await database
+            .select()
+            .from(blacklistEntities)
+            .where(equal(blacklistEntities.entityType, "guild"));
+
+        if (!servers) return [];
+        return servers;
+    }
+
+    public async getUsers(): Promise<SelectBlacklistedEntities[]> {
+        const users = await database
+            .select()
+            .from(blacklistEntities)
+            .where(equal(blacklistEntities.entityType, "user"));
+
+        if (!users) return [];
+        return users;
     }
 }
