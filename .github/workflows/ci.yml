@@ -11,16 +11,28 @@ jobs:
     name: Typecheck
     timeout-minutes: 15
     runs-on: ubuntu-latest
-    env:
-     TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
-     TURBO_TEAM: ${{ vars.TURBO_TEAM }}
-     TURBO_REMOTE_ONLY: true
 
     steps:
       - name: Check out code
         uses: actions/checkout@v4
         with:
           fetch-depth: 2
+
+      - name: Cache turbo build setup
+        uses: actions/cache@v4
+        with:
+          path: .turbo
+          key: ${{ runner.os }}-turbo-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-turbo-
+
+      - name: Cache dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.bun/install/cache
+          key: ${{ runner.os }}-${{ matrix.bun }}-bun-${{ hashFiles('**/bun.lockb') }}
+          restore-keys: |
+            ${{ runner.os }}-${{ matrix.bun }}-bun-
 
       - name: Setup Bun environment
         uses: oven-sh/setup-bun@v2
