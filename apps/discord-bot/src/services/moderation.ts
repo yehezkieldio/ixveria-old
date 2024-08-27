@@ -3,11 +3,14 @@ import { UserError } from "@sapphire/framework";
 import type { Collection, Guild, GuildBan, GuildMember } from "discord.js";
 import { IxveriaIdentifiers } from "#lib/extensions/constants/identifiers";
 import type { ChatMessageContext } from "#lib/typings/message-type";
+import type { MakeOptional } from "#lib/typings/utility-type";
+
+type Action = "kick" | "ban" | "unban";
 
 interface ActionContext {
     executor: GuildMember;
-    targetUser?: GuildMember;
-    targetUserId?: string;
+    targetUser: GuildMember;
+    targetUserId: string;
     reason: string;
 }
 
@@ -69,85 +72,97 @@ export class ModerationService extends Service {
     }
 
     /**
-     * Ensures the action to be performed is valid, by checking common conditions.
+     * Ensures the user is valid for the action, i.e. not the bot or the server owner.
      * @param guild The guild where the action is being performed.
-     * @param executor The user performing the action.
-     * @param targetUser The user the action is being performed on.
-     * @param action The action to be performed, either "kick", "ban" or "unban".
-     * @throws UserError
-     * @returns void
+     * @param userId The user id to check.
+     * @param action The action being performed.
+     * @returns Whether the user is valid.
      */
-    private ensureActionIsValid(
-        guild: Guild,
-        executor: GuildMember,
-        targetUser: GuildMember,
-        action: "kick" | "ban" | "unban",
-    ): void {
-        if (targetUser.id === executor.id) {
-            throw new UserError({
-                identifier: IxveriaIdentifiers.CommandServiceError,
-                message: `You cannot ${action} yourself.`,
-            });
-        }
-
-        if (targetUser.id === this.container.client.id) {
+    private async ensureUserIsValid(guild: Guild, userId: string, action: Action): Promise<void> {
+        if (userId === this.container.client.id) {
             throw new UserError({
                 identifier: IxveriaIdentifiers.CommandServiceError,
                 message: `I cannot ${action} myself.`,
             });
         }
 
-        if (targetUser.id === guild.ownerId) {
+        if (userId === guild.ownerId) {
             throw new UserError({
                 identifier: IxveriaIdentifiers.CommandServiceError,
                 message: `You cannot ${action} the server owner.`,
             });
         }
+    }
 
+    /**
+     * Ensure if the executor has a higher role than the target user.
+     * @param executor The user performing the action.
+     * @param targetUser The user to perform the action on.
+     * @param action The action being performed.
+     * @returns Whether the executor has a higher role than the target user.
+     */
+    private async ensureRoleHierarchy(executor: GuildMember, targetUser: GuildMember, action: Omit<Action, "unban">) {
         if (targetUser.roles.highest.position >= executor.roles.highest.position) {
             throw new UserError({
                 identifier: IxveriaIdentifiers.CommandServiceError,
                 message: `You cannot ${action} a user with an equal or higher role than yours.`,
             });
         }
+    }
 
-        if (action === "kick" && !targetUser.kickable) {
-            throw new UserError({
-                identifier: IxveriaIdentifiers.CommandServiceError,
-                message: `I cannot ${action} this user.`,
-            });
+    /**
+     * Ensure if the action is valid, i.e. the user is kickable or bannable, or the user is not banned.
+     * @param targetUser The user to perform the action on.
+     * @param action The action being performed.
+     * @returns Whether the action is valid.
+     */
+    private async ensureActionIsValid(targetUser: GuildMember, action: Action): Promise<void> {
+        if (action === "kick") {
+            if (!targetUser.kickable) {
+                throw new UserError({
+                    identifier: IxveriaIdentifiers.CommandServiceError,
+                    message: `I cannot ${action} this user.`,
+                });
+            }
+            return;
         }
 
-        if (action === "ban" && !targetUser.bannable) {
-            throw new UserError({
-                identifier: IxveriaIdentifiers.CommandServiceError,
-                message: "I cannot ban this user.",
-            });
+        if (action === "ban") {
+            await this.ensureUserIsNotBanned(targetUser.guild, targetUser);
+            if (!targetUser.bannable) {
+                throw new UserError({
+                    identifier: IxveriaIdentifiers.CommandServiceError,
+                    message: "I cannot ban this user.",
+                });
+            }
+            return;
+        }
+
+        if (action === "unban") {
+            await this.ensureUserIsBanned(targetUser.guild, targetUser);
         }
     }
 
     /**
-     * Validates the action to be performed.
+     * Perform a preflight check before performing an action.
      * @param guild The guild where the action is being performed.
-     * @param executor The user performing the action.
-     * @param targetUser The user the action is being performed on.
-     * @param action The action to be performed, either "kick", "ban" or "unban".
-     * @returns Whether the action is valid.
+     * @param context The context of the action, containing the executor, target user and reason.
+     * @param action The action being performed.
+     * @returns Whether the preflight check was successful.
      */
-    private async validateAction(
-        guild: ChatMessageContext["guild"],
-        executor: GuildMember,
-        targetUser: GuildMember,
-        action: "kick" | "ban" | "unban",
+    private async preflightAction(
+        guild: Guild,
+        context: MakeOptional<ActionContext, "targetUserId" | "targetUser">,
+        action: Action,
     ): Promise<void> {
-        this.ensureActionIsValid(guild as Guild, executor, targetUser, action);
-
-        if (action === "ban") {
-            await this.ensureUserIsNotBanned(guild, targetUser);
+        if (context.targetUserId && action === "unban") {
+            await this.ensureUserIsValid(guild, context.targetUserId, "unban");
         }
 
-        if (action === "unban") {
-            await this.ensureUserIsBanned(guild, targetUser);
+        if (context.targetUser) {
+            await this.ensureUserIsValid(guild, context.targetUser.id, action);
+            await this.ensureRoleHierarchy(context.executor, context.targetUser, action);
+            await this.ensureActionIsValid(context.executor, action);
         }
     }
 
@@ -161,15 +176,8 @@ export class ModerationService extends Service {
      * @param reason The reason for the kick.
      * @returns Whether the kick was successful.
      */
-    public async kick(guild: ChatMessageContext["guild"], context: ActionContext): Promise<boolean> {
-        if (!context.targetUser) {
-            throw new UserError({
-                identifier: IxveriaIdentifiers.CommandServiceError,
-                message: "You didn't provide any user to kick, how am I supposed to do that?",
-            });
-        }
-
-        await this.validateAction(guild, context.executor, context.targetUser, "kick");
+    public async kick(guild: Guild, context: Omit<ActionContext, "targetUserId">): Promise<boolean> {
+        await this.preflightAction(guild, context, "kick");
 
         const kick = await context.targetUser.kick(context.reason);
         if (kick) return true;
@@ -183,15 +191,8 @@ export class ModerationService extends Service {
      * @param context The context of the action, containing the executor, target user and reason.
      * @returns Whether the ban was successful.
      */
-    public async ban(guild: ChatMessageContext["guild"], context: ActionContext): Promise<boolean> {
-        if (!context.targetUser) {
-            throw new UserError({
-                identifier: IxveriaIdentifiers.CommandServiceError,
-                message: "You didn't provide any user to ban, how am I supposed to do that?",
-            });
-        }
-
-        await this.validateAction(guild, context.executor, context.targetUser, "ban");
+    public async ban(guild: Guild, context: Omit<ActionContext, "targetUserId">): Promise<boolean> {
+        await this.preflightAction(guild, context, "ban");
 
         const ban = await context.targetUser.ban({ reason: context.reason });
         if (ban) return true;
@@ -205,13 +206,8 @@ export class ModerationService extends Service {
      * @param context The context of the action, containing the executor, target user and reason.
      * @returns Whether the unban was successful.
      */
-    public async unban(guild: Guild, context: ActionContext): Promise<boolean> {
-        if (!context.targetUserId) {
-            throw new UserError({
-                identifier: IxveriaIdentifiers.CommandServiceError,
-                message: "You didn't provide any user id to unban, how am I supposed to do that?",
-            });
-        }
+    public async unban(guild: Guild, context: Omit<ActionContext, "targetUser">): Promise<boolean> {
+        await this.preflightAction(guild, context, "unban");
 
         const unban = await guild.bans.remove(context.targetUserId, context.reason);
         if (unban) return true;
