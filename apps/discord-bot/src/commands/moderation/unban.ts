@@ -3,6 +3,7 @@ import { UserError } from "@sapphire/framework";
 import { type Guild, type GuildMember, type Message, PermissionFlagsBits, SlashCommandBuilder } from "discord.js";
 import { IxveriaCommand } from "#lib/extensions/command";
 import { IxveriaIdentifiers } from "#lib/extensions/constants/identifiers";
+import type { ModerationActionContext } from "#services/moderation";
 
 export class UnBanCommand extends IxveriaCommand {
     public constructor(context: IxveriaCommand.LoaderContext, options: IxveriaCommand.Options) {
@@ -53,7 +54,11 @@ export class UnBanCommand extends IxveriaCommand {
 
         const executor: GuildMember = await bot.getUserAsGuildMember(interaction.user.id, interaction.guild);
 
-        const response: string = await this.unBanUser(interaction.guild, executor, userId, reason);
+        const response = await this.unbanUser(interaction.guild, {
+            executor: executor,
+            targetUserId: userId,
+            reason: reason,
+        });
 
         return interaction.reply(response);
     }
@@ -87,22 +92,28 @@ export class UnBanCommand extends IxveriaCommand {
 
         const executor: GuildMember = await bot.getUserAsGuildMember(message.author.id, message.guild);
 
-        const response: string = await this.unBanUser(message.guild, executor, userId, reason);
+        const response = await this.unbanUser(message.guild, {
+            executor: executor,
+            targetUserId: userId,
+            reason: reason,
+        });
 
         return message.reply(response);
     }
 
     /* -------------------------------------------------------------------------- */
 
-    private async unBanUser(guild: Guild, executor: GuildMember, targetId: string, reason: string) {
+    private async unbanUser(guild: Guild, context: Omit<ModerationActionContext, "targetUser">): Promise<string> {
         const { moderation } = this.container.services;
 
-        await moderation.unban(guild, {
-            executor: executor,
-            targetUserId: targetId,
-            reason: reason,
-        });
+        const unban = await moderation.unban(guild, context);
+        if (unban) {
+            return `Kicking ${context.targetUserId} for reason: ${context.reason}`;
+        }
 
-        return `Unbanning ${targetId} for reason: ${reason}`;
+        throw new UserError({
+            identifier: IxveriaIdentifiers.CommandServiceError,
+            message: `I cannot kick ${context.targetUserId}.`,
+        });
     }
 }

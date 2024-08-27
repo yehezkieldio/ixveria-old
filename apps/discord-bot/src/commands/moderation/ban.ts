@@ -11,6 +11,7 @@ import {
 import { IxveriaCommand } from "#lib/extensions/command";
 import { IxveriaIdentifiers } from "#lib/extensions/constants/identifiers";
 import { IxveriaEmbedBuilder } from "#lib/extensions/embed-builder";
+import type { ModerationActionContext } from "#services/moderation";
 
 export class BanCommand extends IxveriaCommand {
     public constructor(context: IxveriaCommand.LoaderContext, options: IxveriaCommand.Options) {
@@ -36,6 +37,12 @@ export class BanCommand extends IxveriaCommand {
                     .setName("reason")
                     .setDescription("The reason for banning the user from the server.")
                     .setRequired(false),
+            )
+            .addBooleanOption((option) =>
+                option
+                    .setName("silent")
+                    .setDescription("Whether to send a message to the user being banned.")
+                    .setRequired(false),
             );
 
         void registry.registerChatInputCommand(command);
@@ -51,6 +58,7 @@ export class BanCommand extends IxveriaCommand {
 
         const user: User = interaction.options.getUser("user", true);
         const reason: string = interaction.options.getString("reason") ?? this.#defaultReason;
+        const silent: boolean = interaction.options.getBoolean("silent") ?? false;
 
         if (!interaction.guild) {
             throw new UserError({
@@ -62,7 +70,12 @@ export class BanCommand extends IxveriaCommand {
         const executor: GuildMember = await bot.getUserAsGuildMember(interaction.user.id, interaction.guild);
         const target: GuildMember = await bot.getUserAsGuildMember(user.id, interaction.guild);
 
-        const response: string = await this.banUser(interaction.guild, executor, target, reason);
+        const response = await this.banUser(interaction.guild, {
+            executor: executor,
+            targetUser: target,
+            reason: reason,
+            silent: silent,
+        });
 
         return interaction.reply(response);
     }
@@ -87,6 +100,14 @@ export class BanCommand extends IxveriaCommand {
             reason = reasonArgument.unwrap();
         }
 
+        const silentArgument: ResultType<boolean> = await args.restResult("boolean");
+        let silent: boolean;
+        if (reasonArgument.isErr()) {
+            silent = false;
+        } else {
+            silent = silentArgument.unwrap();
+        }
+
         if (!message.guild) {
             throw new UserError({
                 identifier: IxveriaIdentifiers.CommandServiceError,
@@ -97,30 +118,39 @@ export class BanCommand extends IxveriaCommand {
         const executor: GuildMember = await bot.getUserAsGuildMember(message.author.id, message.guild);
         const target: GuildMember = await bot.getUserAsGuildMember(user.id, message.guild);
 
-        const response: string = await this.banUser(message.guild, executor, target, reason);
+        const response = await this.banUser(message.guild, {
+            executor: executor,
+            targetUser: target,
+            reason: reason,
+            silent: silent,
+        });
 
         return message.reply(response);
     }
 
     /* -------------------------------------------------------------------------- */
 
-    private async banUser(guild: Guild, executor: GuildMember, target: GuildMember, reason: string) {
+    private async banUser(guild: Guild, context: Omit<ModerationActionContext, "targetUserId">): Promise<string> {
         const { moderation } = this.container.services;
 
-        await moderation.ban(guild, {
-            executor: executor,
-            targetUser: target,
-            reason: reason,
-        });
+        const ban = await moderation.ban(guild, context);
+        if (ban) {
+            if (!context.silent) {
+                context.targetUser.send({
+                    embeds: [
+                        new IxveriaEmbedBuilder()
+                            .setTheme("warning")
+                            .setDescription(`You have been banned from ${guild.name} for reason: ${context.reason}`),
+                    ],
+                });
+            }
 
-        target.send({
-            embeds: [
-                new IxveriaEmbedBuilder()
-                    .setTheme("warning")
-                    .setDescription(`You have been banned from ${guild.name} for reason: ${reason}`),
-            ],
-        });
+            return `Banning ${context.targetUser.user.tag} for reason: ${context.reason}`;
+        }
 
-        return `Banning ${target.user.tag} for reason: ${reason}`;
+        throw new UserError({
+            identifier: IxveriaIdentifiers.CommandServiceError,
+            message: `I cannot ban ${context.targetUser.user.tag}.`,
+        });
     }
 }

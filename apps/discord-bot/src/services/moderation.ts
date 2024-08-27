@@ -7,11 +7,12 @@ import type { MakeOptional } from "#lib/typings/utility-type";
 
 type Action = "kick" | "ban" | "unban";
 
-interface ActionContext {
+export interface ModerationActionContext {
     executor: GuildMember;
     targetUser: GuildMember;
     targetUserId: string;
     reason: string;
+    silent?: boolean;
 }
 
 export class ModerationService extends Service {
@@ -152,7 +153,7 @@ export class ModerationService extends Service {
      */
     private async preflightAction(
         guild: Guild,
-        context: MakeOptional<ActionContext, "targetUserId" | "targetUser">,
+        context: MakeOptional<ModerationActionContext, "targetUserId" | "targetUser">,
         action: Action,
     ): Promise<void> {
         if (context.targetUserId && action === "unban") {
@@ -176,7 +177,7 @@ export class ModerationService extends Service {
      * @param reason The reason for the kick.
      * @returns Whether the kick was successful.
      */
-    public async kick(guild: Guild, context: Omit<ActionContext, "targetUserId">): Promise<boolean> {
+    public async kick(guild: Guild, context: Omit<ModerationActionContext, "targetUserId">): Promise<boolean> {
         await this.preflightAction(guild, context, "kick");
 
         const kick = await context.targetUser.kick(context.reason);
@@ -191,7 +192,7 @@ export class ModerationService extends Service {
      * @param context The context of the action, containing the executor, target user and reason.
      * @returns Whether the ban was successful.
      */
-    public async ban(guild: Guild, context: Omit<ActionContext, "targetUserId">): Promise<boolean> {
+    public async ban(guild: Guild, context: Omit<ModerationActionContext, "targetUserId">): Promise<boolean> {
         await this.preflightAction(guild, context, "ban");
 
         const ban = await context.targetUser.ban({ reason: context.reason });
@@ -206,7 +207,7 @@ export class ModerationService extends Service {
      * @param context The context of the action, containing the executor, target user and reason.
      * @returns Whether the unban was successful.
      */
-    public async unban(guild: Guild, context: Omit<ActionContext, "targetUser">): Promise<boolean> {
+    public async unban(guild: Guild, context: Omit<ModerationActionContext, "targetUser">): Promise<boolean> {
         await this.preflightAction(guild, context, "unban");
 
         const unban = await guild.bans.remove(context.targetUserId, context.reason);
