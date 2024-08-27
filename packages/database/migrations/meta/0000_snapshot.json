@@ -1,5 +1,5 @@
 {
-  "id": "cb3c861e-b740-4035-85eb-84710e826a4f",
+  "id": "0c0e4d68-7000-408e-b249-d3e375e35a61",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -15,15 +15,15 @@
           "notNull": true,
           "default": "gen_random_uuid()"
         },
-        "entityId": {
-          "name": "entityId",
+        "entity_id": {
+          "name": "entity_id",
           "type": "varchar",
           "primaryKey": false,
           "notNull": true
         },
-        "entityType": {
-          "name": "entityType",
-          "type": "blacklist_entity_type",
+        "entity_type": {
+          "name": "entity_type",
+          "type": "blacklist_types",
           "typeSchema": "public",
           "primaryKey": false,
           "notNull": true
@@ -34,13 +34,13 @@
           "name": "blacklist_entity_entity_id_type_uidx",
           "columns": [
             {
-              "expression": "entityId",
+              "expression": "entity_id",
               "isExpression": false,
               "asc": true,
               "nulls": "last"
             },
             {
-              "expression": "entityType",
+              "expression": "entity_type",
               "isExpression": false,
               "asc": true,
               "nulls": "last"
@@ -56,8 +56,8 @@
       "compositePrimaryKeys": {},
       "uniqueConstraints": {}
     },
-    "public.guild_settings": {
-      "name": "guild_settings",
+    "public.guild_setting": {
+      "name": "guild_setting",
       "schema": "",
       "columns": {
         "id": {
@@ -82,8 +82,8 @@
         }
       },
       "indexes": {
-        "guild_settings_guild_id_uidx": {
-          "name": "guild_settings_guild_id_uidx",
+        "guild_setting_guild_id_uidx": {
+          "name": "guild_setting_guild_id_uidx",
           "columns": [
             {
               "expression": "guild_id",
@@ -99,9 +99,9 @@
         }
       },
       "foreignKeys": {
-        "guild_settings_guild_id_guild_id_fk": {
-          "name": "guild_settings_guild_id_guild_id_fk",
-          "tableFrom": "guild_settings",
+        "guild_setting_guild_id_guild_id_fk": {
+          "name": "guild_setting_guild_id_guild_id_fk",
+          "tableFrom": "guild_setting",
           "tableTo": "guild",
           "columnsFrom": [
             "guild_id"
@@ -196,8 +196,8 @@
     }
   },
   "enums": {
-    "public.blacklist_entity_type": {
-      "name": "blacklist_entity_type",
+    "public.blacklist_types": {
+      "name": "blacklist_types",
       "schema": "public",
       "values": [
         "user",

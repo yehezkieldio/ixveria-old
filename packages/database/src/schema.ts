@@ -1,7 +1,7 @@
 import { relations, sql } from "drizzle-orm";
 import { type PgTableFn, pgEnum, pgTable, pgTableCreator, text, uniqueIndex, uuid, varchar } from "drizzle-orm/pg-core";
 
-export const createTable: PgTableFn = pgTableCreator((name: string): string => `Ixveria_${name}`);
+export const createTable: PgTableFn = pgTableCreator((name: string): string => `ixveria_${name}`);
 
 /* ---------------------------------- USER ---------------------------------- */
 
@@ -34,14 +34,14 @@ export const guildsRelations = relations(guilds, ({ one }) => ({
 }));
 
 export const guildSettings = pgTable(
-    "guild_settings",
+    "guild_setting",
     {
         id: uuid("id").defaultRandom().primaryKey(),
         guildId: uuid("guild_id").references(() => guilds.id),
         disabledCommands: text("disabled_commands").array().notNull().default(sql`'{}'::text[]`),
     },
     (guildSettings) => ({
-        guildIdUidx: uniqueIndex("guild_settings_guild_id_uidx").on(guildSettings.guildId),
+        guildIdUidx: uniqueIndex("guild_setting_guild_id_uidx").on(guildSettings.guildId),
     }),
 );
 
@@ -51,14 +51,14 @@ export const guildSettingsRelations = relations(guildSettings, ({ one }) => ({
 
 /* -------------------------------------------------------------------------- */
 
-export const blacklistType = pgEnum("blacklist_entity_type", ["user", "guild"]);
+export const blacklistTypes = pgEnum("blacklist_types", ["user", "guild"]);
 
-export const blacklistEntity = pgTable(
+export const blacklistEntities = pgTable(
     "blacklist_entity",
     {
         id: uuid("id").defaultRandom().primaryKey(),
-        entityId: varchar("entityId").notNull(),
-        entityType: blacklistType("entityType").notNull(),
+        entityId: varchar("entity_id").notNull(),
+        entityType: blacklistTypes("entity_type").notNull(),
     },
     (blacklistEntity) => ({
         entityIdTypeUidx: uniqueIndex("blacklist_entity_entity_id_type_uidx").on(

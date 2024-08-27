@@ -20,6 +20,9 @@
         "db:generate": {
             "cache": false
         },
+        "db:drop": {
+            "cache": false
+        },
         "db:migrate": {
             "cache": false
         },
