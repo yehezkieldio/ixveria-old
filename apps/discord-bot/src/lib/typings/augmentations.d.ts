@@ -1,3 +1,4 @@
+import type { BlacklistService } from "#services/blacklist";
 import type { ModerationService } from "#services/moderation";
 import type { ResponseService } from "#services/response";
 import type { BotUtilities } from "#utilities/bot";
@@ -6,6 +7,7 @@ declare module "@sapphire/pieces" {
     interface Services {
         response: ResponseService;
         moderation: ModerationService;
+        blacklist: BlacklistService;
     }
 
     interface Utilities {
