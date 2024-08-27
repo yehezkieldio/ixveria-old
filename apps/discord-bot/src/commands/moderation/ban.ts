@@ -24,6 +24,7 @@ export class BanCommand extends IxveriaCommand {
             requiredClientPermissions: [PermissionFlagsBits.BanMembers],
             requiredUserPermissions: [PermissionFlagsBits.BanMembers],
             runIn: CommandOptionsRunTypeEnum.GuildAny,
+            flags: ["silent", "s"],
         });
     }
 

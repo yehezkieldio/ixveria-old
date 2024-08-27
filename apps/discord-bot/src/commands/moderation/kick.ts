@@ -21,6 +21,7 @@ export class KickCommand extends IxveriaCommand {
             requiredClientPermissions: [PermissionFlagsBits.KickMembers],
             requiredUserPermissions: [PermissionFlagsBits.KickMembers],
             runIn: CommandOptionsRunTypeEnum.GuildAny,
+            flags: ["silent", "s"],
         });
     }
 
