@@ -18,7 +18,7 @@ export class BanCommand extends IxveriaCommand {
         super(context, {
             ...options,
             description: "Ban a user from the server.",
-            tags: ["moderation"],
+            tags: ["moderation", "moderation-action", "punishment"],
             requiredClientPermissions: [PermissionFlagsBits.BanMembers],
             requiredUserPermissions: [PermissionFlagsBits.BanMembers],
             runIn: CommandOptionsRunTypeEnum.GuildAny,

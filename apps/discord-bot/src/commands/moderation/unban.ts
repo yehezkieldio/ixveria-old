@@ -10,7 +10,7 @@ export class UnBanCommand extends IxveriaCommand {
         super(context, {
             ...options,
             description: "Remove a ban from a user in the server.",
-            tags: ["moderation"],
+            tags: ["moderation", "moderation-action", "punishment"],
             requiredClientPermissions: [PermissionFlagsBits.BanMembers],
             requiredUserPermissions: [PermissionFlagsBits.BanMembers],
             runIn: CommandOptionsRunTypeEnum.GuildAny,

@@ -17,7 +17,7 @@ export class KickCommand extends IxveriaCommand {
         super(context, {
             ...options,
             description: "Kick a user from the server.",
-            tags: ["moderation"],
+            tags: ["moderation", "moderation-action", "punishment"],
             requiredClientPermissions: [PermissionFlagsBits.KickMembers],
             requiredUserPermissions: [PermissionFlagsBits.KickMembers],
             runIn: CommandOptionsRunTypeEnum.GuildAny,
