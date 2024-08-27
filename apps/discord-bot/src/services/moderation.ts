@@ -6,7 +6,8 @@ import type { ChatMessageContext } from "#lib/typings/message-type";
 
 interface ActionContext {
     executor: GuildMember;
-    targetUser: GuildMember;
+    targetUser?: GuildMember;
+    targetUserId?: string;
     reason: string;
 }
 
@@ -161,6 +162,13 @@ export class ModerationService extends Service {
      * @returns Whether the kick was successful.
      */
     public async kick(guild: ChatMessageContext["guild"], context: ActionContext): Promise<boolean> {
+        if (!context.targetUser) {
+            throw new UserError({
+                identifier: IxveriaIdentifiers.CommandServiceError,
+                message: "You didn't provide any user to kick, how am I supposed to do that?",
+            });
+        }
+
         await this.validateAction(guild, context.executor, context.targetUser, "kick");
 
         const kick = await context.targetUser.kick(context.reason);
@@ -176,6 +184,13 @@ export class ModerationService extends Service {
      * @returns Whether the ban was successful.
      */
     public async ban(guild: ChatMessageContext["guild"], context: ActionContext): Promise<boolean> {
+        if (!context.targetUser) {
+            throw new UserError({
+                identifier: IxveriaIdentifiers.CommandServiceError,
+                message: "You didn't provide any user to ban, how am I supposed to do that?",
+            });
+        }
+
         await this.validateAction(guild, context.executor, context.targetUser, "ban");
 
         const ban = await context.targetUser.ban({ reason: context.reason });
@@ -191,9 +206,14 @@ export class ModerationService extends Service {
      * @returns Whether the unban was successful.
      */
     public async unban(guild: Guild, context: ActionContext): Promise<boolean> {
-        await this.validateAction(guild, context.executor, context.targetUser, "unban");
+        if (!context.targetUserId) {
+            throw new UserError({
+                identifier: IxveriaIdentifiers.CommandServiceError,
+                message: "You didn't provide any user id to unban, how am I supposed to do that?",
+            });
+        }
 
-        const unban = await guild.bans.remove(context.targetUser.id, context.reason);
+        const unban = await guild.bans.remove(context.targetUserId, context.reason);
         if (unban) return true;
 
         return false;
