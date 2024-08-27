@@ -1,5 +1,5 @@
 import { Command, type CommandOptions } from "@sapphire/framework";
-import type { ChatMessageResponse } from "#lib/typings/message-type";
+import type { ChatMessageContext } from "#lib/typings/message-type";
 
 interface IxveriaCommandOptions extends CommandOptions {
     tags: string[];
@@ -26,5 +26,5 @@ export declare namespace IxveriaCommand {
     type ContextMenuCommandInteraction = Command.ContextMenuCommandInteraction;
     type AutocompleteInteraction = Command.AutocompleteInteraction;
     type Registry = Command.Registry;
-    type MessageContext = ChatMessageResponse;
+    type MessageContext = ChatMessageContext;
 }

@@ -1,6 +1,6 @@
 import { Utility } from "@ixveria/stores/utility";
 import type { UserError } from "@sapphire/framework";
-import { ChannelType, chatInputApplicationCommandMention, inlineCode } from "discord.js";
+import { ChannelType, type Guild, chatInputApplicationCommandMention, inlineCode } from "discord.js";
 
 export class BotUtilities extends Utility {
     public constructor(context: Utility.LoaderContext, options: Utility.Options) {
@@ -46,5 +46,15 @@ export class BotUtilities extends Utility {
         if (!commandId) return `/${commandName}`;
 
         return chatInputApplicationCommandMention(command.commandName, commandId);
+    };
+
+    /**
+     * Get a user as a guild member.
+     * @param userId The user ID to get as a guild member.
+     * @param guild The guild to get the user as a guild member in.
+     * @returns The user as a guild member.
+     */
+    public getUserAsGuildMember = async (userId: string, guild: Guild) => {
+        return guild?.members.cache.get(userId) ?? guild?.members.fetch(userId);
     };
 }
