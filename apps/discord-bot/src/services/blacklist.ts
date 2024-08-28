@@ -13,7 +13,7 @@ export class BlacklistService extends Service {
     }
 
     public async getServers(): Promise<SelectBlacklistedEntities[]> {
-        const servers = await database
+        const servers: SelectBlacklistedEntities[] = await database
             .select()
             .from(blacklistEntities)
             .where(equal(blacklistEntities.entityType, "guild"));
@@ -48,5 +48,28 @@ export class BlacklistService extends Service {
             .where(equal(blacklistEntities.entityId, guildId));
 
         return !!server;
+    }
+
+    public async createBlacklist(entityId: string, entityType: "user" | "guild"): Promise<boolean> {
+        const entity = await database
+            .insert(blacklistEntities)
+            .values({
+                entityId,
+                entityType,
+            })
+            .returning();
+
+        if (!entity) return false;
+        return true;
+    }
+
+    public async removeBlacklist(entityId: string): Promise<boolean> {
+        const entity = await database
+            .delete(blacklistEntities)
+            .where(equal(blacklistEntities.entityId, entityId))
+            .returning();
+
+        if (!entity) return false;
+        return true;
     }
 }
