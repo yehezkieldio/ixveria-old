@@ -11,12 +11,14 @@
     "dependencies": {
         "@elysiajs/swagger": "^1.1.1",
         "@ixveria/environment": "workspace:*",
+        "@ixveria/utils": "workspace:*",
         "@sapphire/fetch": "^3.0.2",
         "elysia": "^1.1.8"
     },
     "devDependencies": {
         "@ixveria/typescript": "workspace:*",
         "@types/bun": "latest",
+        "openapi-types": "^12.1.3",
         "tsup": "^8.2.4",
         "typescript": "^5"
     },

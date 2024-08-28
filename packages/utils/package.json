@@ -1,10 +1,8 @@
 {
-    "name": "@ixveria/aggregator-client",
+    "name": "@ixveria/utils",
     "version": "0.0.0",
     "dependencies": {
-        "@ixveria/aggregator": "workspace:*",
-        "@ixveria/environment": "workspace:*",
-        "@elysiajs/eden": "^1.1.2"
+        "type-fest": "^4.25.0"
     },
     "devDependencies": {
         "@ixveria/typescript": "workspace:*",
@@ -12,6 +10,6 @@
         "typescript": "^5"
     },
     "exports": {
-        ".": "./src/client.ts"
+        "./package-json": "./src/package-json.ts"
     }
 }

@@ -10,5 +10,5 @@ export default defineConfig({
     skipNodeModulesBundle: true,
     keepNames: true,
     tsconfig: "tsconfig.json",
-    noExternal: ["@ixveria/environment", "@ixveria/database", "@ixveria/stores"],
+    noExternal: ["@ixveria/environment", "@ixveria/database", "@ixveria/stores", "@ixveria/utils"],
 });
