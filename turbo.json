@@ -28,7 +28,7 @@
         },
         "start": {
             "persistent": true,
-            "dependsOn": ["^build"],
+            "dependsOn": ["build"],
             "cache": false
         },
         "//#biome": {},
