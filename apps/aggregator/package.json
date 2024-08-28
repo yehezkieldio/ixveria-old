@@ -9,7 +9,9 @@
         "typecheck": "tsc --noEmit"
     },
     "dependencies": {
+        "@elysiajs/swagger": "^1.1.1",
         "@ixveria/environment": "workspace:*",
+        "@sapphire/fetch": "^3.0.2",
         "elysia": "^1.1.8"
     },
     "devDependencies": {
