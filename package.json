@@ -5,7 +5,7 @@
     "scripts": {
         "build": "turbo build",
         "start:bot": "turbo start --filter @ixveria/discord-bot",
-        "start:aggregator": "turbo build --filter @ixveria/aggregator && turbo start --filter @ixveria/aggregator",
+        "start:aggregator": "turbo start --filter @ixveria/aggregator",
         "db:push": "turbo db:push",
         "db:studio": "turbo db:studio",
         "db:generate": "turbo db:generate",

@@ -12,6 +12,7 @@
         "@elysiajs/swagger": "^1.1.1",
         "@ixveria/environment": "workspace:*",
         "@ixveria/utils": "workspace:*",
+        "@sapphire/plugin-logger": "^4.0.2",
         "@sapphire/fetch": "^3.0.2",
         "elysia": "^1.1.8"
     },

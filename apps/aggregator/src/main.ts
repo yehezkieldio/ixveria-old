@@ -6,6 +6,7 @@ import { getVersion } from "@ixveria/utils/package-json";
 import Elysia from "elysia";
 import type { OpenAPIV3 } from "openapi-types";
 import mediaModule from "#random/media";
+import { logger } from "./logger";
 
 const documentation: Partial<OpenAPIV3.Document> = {
     info: {
@@ -33,10 +34,16 @@ const aggregator = new Elysia()
 
 /* -------------------------------------------------------------------------- */
 
+logger.info("AggregatorMain: Starting the Aggregator service...");
+
 aggregator.listen({
     development: env.NODE_ENV === "development",
     port: env.AGGREGATOR_PORT,
     hostname: env.AGGREGATOR_HOST,
 });
+
+logger.info(
+    `AggregatorMain: The Aggregator service has started on ${aggregator.server!.hostname}:${aggregator.server!.port}`,
+);
 
 export type Aggregator = typeof aggregator;
