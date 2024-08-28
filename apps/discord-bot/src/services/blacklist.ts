@@ -4,6 +4,8 @@ import { Service } from "@ixveria/stores/service";
 
 type SelectBlacklistedEntities = typeof blacklistEntities.$inferSelect;
 
+export type BlacklistEntities = Omit<SelectBlacklistedEntities, "id">;
+
 export class BlacklistService extends Service {
     public constructor(context: Service.LoaderContext, options: Service.Options) {
         super(context, {
