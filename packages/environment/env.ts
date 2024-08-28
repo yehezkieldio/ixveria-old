@@ -10,6 +10,7 @@ export const env = createEnv({
     server: {
         NODE_ENV: z.enum(["development", "production"]).default("development"),
         DISCORD_TOKEN: z.string(),
+        AGGREGATOR_PORT: z.string().default("3000"),
         DATABASE_URL: z.string().url(),
     },
 
