@@ -20,7 +20,7 @@ export abstract class IxveriaSubcommand extends Subcommand {
 export declare namespace IxveriaSubcommand {
     type Options = IxveriaSubcommandOptions;
     type JSON = Subcommand.JSON;
-    type Context = Subcommand.LoaderContext;
+    type LoaderContext = Subcommand.LoaderContext;
     type RunInTypes = Subcommand.RunInTypes;
     type ChatInputCommandInteraction = Subcommand.ChatInputCommandInteraction;
     type ContextMenuCommandInteraction = Subcommand.ContextMenuCommandInteraction;
