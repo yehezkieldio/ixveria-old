@@ -1,7 +1,5 @@
-import { type Args, CommandOptionsRunTypeEnum, type ResultType } from "@sapphire/framework";
+import { type Args, CommandOptionsRunTypeEnum, type Result, type ResultType } from "@sapphire/framework";
 import { UserError } from "@sapphire/framework";
-import * as chrono from "chrono-node";
-import dayjs from "dayjs";
 import {
     type Guild,
     type GuildMember,
@@ -13,6 +11,7 @@ import {
 import { IxveriaCommand } from "#lib/extensions/command";
 import { IxveriaIdentifiers } from "#lib/extensions/constants/identifiers";
 import { IxveriaEmbedBuilder } from "#lib/extensions/embed-builder";
+import { IxveriaResolvers } from "#lib/extensions/resolvers";
 import type { BanActionContext, ModerationActionContext } from "#services/moderation";
 
 export class BanCommand extends IxveriaCommand {
@@ -70,14 +69,12 @@ export class BanCommand extends IxveriaCommand {
         const isSilent: boolean = interaction.options.getBoolean("silent") ?? false;
         const deleteMessage: string = interaction.options.getString("delete_message") ?? "0";
 
-        const parsedTime = chrono.parseDate(deleteMessage);
-        const time = dayjs(parsedTime);
-        const seconds = time.second();
+        const seconds: Result<number, string> = IxveriaResolvers.resolveNaturalDate(deleteMessage);
 
-        if (seconds > 604800) {
+        if (seconds.isErr()) {
             throw new UserError({
                 identifier: IxveriaIdentifiers.CommandServiceError,
-                message: "You cannot clear messages older than 7 days.",
+                message: seconds.unwrapErr(),
             });
         }
 
@@ -96,7 +93,7 @@ export class BanCommand extends IxveriaCommand {
             targetUser: target,
             reason: reason,
             silent: isSilent,
-            deleteMessageSeconds: seconds,
+            deleteMessageSeconds: seconds.unwrap(),
         });
 
         return interaction.reply(response);

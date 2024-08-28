@@ -1,7 +1,6 @@
-import { Argument } from "@sapphire/framework";
-import * as chrono from "chrono-node";
-import dayjs from "dayjs";
+import { Argument, type Result } from "@sapphire/framework";
 import { IxveriaIdentifiers } from "#lib/extensions/constants/identifiers";
+import { IxveriaResolvers } from "#lib/extensions/resolvers";
 
 export class NaturalDateArgument extends Argument<number> {
     public constructor(context: Argument.LoaderContext) {
@@ -9,11 +8,18 @@ export class NaturalDateArgument extends Argument<number> {
     }
 
     public run(argument: string, context: Argument.Context): Argument.Result<number> {
-        const parsed = chrono.parseDate(argument);
-        const time = dayjs(parsed);
-        const seconds = time.second();
+        const seconds: Result<number, string> = IxveriaResolvers.resolveNaturalDate(argument);
 
-        if (seconds > 604800) {
+        if (seconds.isErr()) {
+            return this.error({
+                context,
+                parameter: argument,
+                message: "Invalid date provided.",
+                identifier: IxveriaIdentifiers.CommandServiceError,
+            });
+        }
+
+        if (seconds.unwrap() > 604800) {
             return this.error({
                 context,
                 parameter: argument,
@@ -22,6 +28,6 @@ export class NaturalDateArgument extends Argument<number> {
             });
         }
 
-        return this.ok(seconds);
+        return this.ok(seconds.unwrap());
     }
 }
