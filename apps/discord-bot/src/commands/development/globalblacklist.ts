@@ -1,9 +1,8 @@
 import { type Args, CommandOptionsRunTypeEnum, type ResultType, UserError } from "@sapphire/framework";
-import type { Guild, Message, User } from "discord.js";
+import type { Message } from "discord.js";
 import { IxveriaIdentifiers } from "#lib/extensions/constants/identifiers";
 import { IxveriaEmbedBuilder } from "#lib/extensions/embed-builder";
 import { IxveriaSubcommand } from "#lib/extensions/subcommand";
-import type { BlacklistEntities } from "#services/blacklist";
 
 export class GlobalBlacklistCommand extends IxveriaSubcommand {
     public constructor(context: IxveriaSubcommand.LoaderContext, options: IxveriaSubcommand.Options) {
@@ -30,6 +29,8 @@ export class GlobalBlacklistCommand extends IxveriaSubcommand {
         });
     }
 
+    #types = ["server", "user"];
+
     /* -------------------------------------------------------------------------- */
 
     public async messageBlacklistList(message: Message, args: Args): Promise<Message> {
@@ -43,30 +44,30 @@ export class GlobalBlacklistCommand extends IxveriaSubcommand {
         }
 
         const type: string = typeArgument.unwrap();
-        const types: string[] = ["guild", "server", "user"];
 
-        if (!types.includes(type)) {
+        if (!this.#types.includes(type)) {
             throw new UserError({
                 identifier: IxveriaIdentifiers.InvalidArgumentProvided,
-                message: "You provided an invalid blacklist type!",
+                message: `Invalid blacklist type provided. Valid types are: ${this.#types.join(", ")}`,
             });
         }
 
-        let blacklists: BlacklistEntities[] = [];
         const names: string[] = [];
 
-        if (type === "guild" || type === "server") {
-            blacklists = await this.container.services.blacklist.getServers();
-            blacklists.map((blacklist) => {
-                const guild: Guild | undefined = this.container.client.guilds.cache.get(blacklist.entityId);
-                names.push(guild ? guild.name : blacklist.entityId);
-            });
-        } else {
-            blacklists = await this.container.services.blacklist.getUsers();
-            blacklists.map((blacklist) => {
-                const user: User | undefined = this.container.client.users.cache.get(blacklist.entityId);
-                names.push(user ? user.tag : blacklist.entityId);
-            });
+        if (type === "server") {
+            const list = await this.container.services.blacklist.getServers();
+            for (const entity of list) {
+                const entityName = this.container.client.guilds.cache.get(entity.entityId);
+                names.push(entityName ? entityName.name : entity.entityId);
+            }
+        }
+
+        if (type === "user") {
+            const list = await this.container.services.blacklist.getUsers();
+            for (const entity of list) {
+                const entityName = this.container.client.users.cache.get(entity.entityId);
+                names.push(entityName ? entityName.tag : entity.entityId);
+            }
         }
 
         const embed: IxveriaEmbedBuilder = new IxveriaEmbedBuilder().setTheme("information");
@@ -83,7 +84,7 @@ export class GlobalBlacklistCommand extends IxveriaSubcommand {
 
     /* -------------------------------------------------------------------------- */
 
-    public async messageBlacklistAdd(message: Message): Promise<Message> {
+    public async messageBlacklistAdd(message: Message, args: Args): Promise<Message> {
         return message.reply("Under construction!");
     }
 

@@ -27,8 +27,8 @@ export class BlacklistCheckPrecondition extends AllFlowsPrecondition {
         if (userId === null) return this.ok();
 
         const [isServerBlacklisted, isUserBlacklisted] = await Promise.all([
-            this.container.services.blacklist.ensureServerIsBlacklisted(guildId),
-            this.container.services.blacklist.ensureUserIsBlacklisted(userId),
+            this.container.services.blacklist.isServerBlacklisted(guildId),
+            this.container.services.blacklist.isUserBlacklisted(userId),
         ]);
 
         if (isServerBlacklisted) {

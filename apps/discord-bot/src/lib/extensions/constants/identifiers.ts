@@ -11,6 +11,9 @@ enum Identifiers {
     /* ------------------------------ COMMAND ERROR ----------------------------- */
     InvalidArgumentProvided = "invalidArgumentProvided",
     CommandServiceError = "commandServiceError",
+
+    /* ------------------------------ SERVICE ERROR ----------------------------- */
+    ServiceError = "serviceError",
 }
 
 export const IxveriaIdentifiers = {
