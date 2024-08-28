@@ -152,7 +152,62 @@ export class GlobalBlacklistCommand extends IxveriaSubcommand {
 
     /* -------------------------------------------------------------------------- */
 
-    public async messageBlacklistRemove(message: Message): Promise<Message> {
-        return message.reply("Under construction!");
+    public async messageBlacklistRemove(message: Message, args: Args): Promise<Message> {
+        const typeArgument: ResultType<string> = await args.restResult("string");
+
+        if (typeArgument.isErr()) {
+            throw new UserError({
+                identifier: IxveriaIdentifiers.ArgsMissing,
+                message: "You didn't provide any type of blacklist to list!",
+            });
+        }
+
+        const type = typeArgument.unwrap() as BlacklistType;
+
+        if (!this.#types.includes(type)) {
+            throw new UserError({
+                identifier: IxveriaIdentifiers.InvalidArgumentProvided,
+                message: `Invalid blacklist type provided. Valid types are: ${this.#types.join(", ")}`,
+            });
+        }
+
+        const idArgument: ResultType<string> = await args.restResult("string");
+
+        if (idArgument.isErr()) {
+            throw new UserError({
+                identifier: IxveriaIdentifiers.ArgsMissing,
+                message: "You didn't provide any ID to blacklist!",
+            });
+        }
+
+        const id: string = idArgument.unwrap();
+
+        if (type === "user") {
+            const entity = await this.container.utilities.bot.getUserFromId(id);
+
+            if (!entity) {
+                throw new UserError({
+                    identifier: IxveriaIdentifiers.InvalidArgumentProvided,
+                    message: "Invalid user ID provided!",
+                });
+            }
+
+            await this.container.services.blacklist.remove(entity.id);
+        }
+
+        if (type === "guild") {
+            const entity = await this.container.utilities.bot.getGuildFromId(id);
+
+            if (!entity) {
+                throw new UserError({
+                    identifier: IxveriaIdentifiers.InvalidArgumentProvided,
+                    message: "Invalid server ID provided!",
+                });
+            }
+
+            await this.container.services.blacklist.remove(entity.id);
+        }
+
+        return message.reply("Successfully removed the entity from the blacklist!");
     }
 }
