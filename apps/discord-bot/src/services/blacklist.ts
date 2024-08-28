@@ -5,7 +5,6 @@ import { UserError } from "@sapphire/framework";
 import { IxveriaIdentifiers } from "#lib/extensions/constants/identifiers";
 
 type SelectBlacklistedEntities = typeof blacklistEntities.$inferSelect;
-
 export type BlacklistEntities = Omit<SelectBlacklistedEntities, "id">;
 
 export class BlacklistService extends Service {

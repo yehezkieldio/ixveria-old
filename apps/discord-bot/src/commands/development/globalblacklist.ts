@@ -1,3 +1,4 @@
+import type { BlacklistType } from "@ixveria/database/schema";
 import { type Args, CommandOptionsRunTypeEnum, type ResultType, UserError } from "@sapphire/framework";
 import type { Message } from "discord.js";
 import { IxveriaIdentifiers } from "#lib/extensions/constants/identifiers";
@@ -43,7 +44,7 @@ export class GlobalBlacklistCommand extends IxveriaSubcommand {
             });
         }
 
-        const type: string = typeArgument.unwrap();
+        const type = typeArgument.unwrap() as BlacklistType;
 
         if (!this.#types.includes(type)) {
             throw new UserError({
@@ -54,7 +55,7 @@ export class GlobalBlacklistCommand extends IxveriaSubcommand {
 
         const names: string[] = [];
 
-        if (type === "server") {
+        if (type === "guild") {
             const list = await this.container.services.blacklist.getServers();
             for (const entity of list) {
                 const entityName = this.container.client.guilds.cache.get(entity.entityId);
@@ -85,7 +86,68 @@ export class GlobalBlacklistCommand extends IxveriaSubcommand {
     /* -------------------------------------------------------------------------- */
 
     public async messageBlacklistAdd(message: Message, args: Args): Promise<Message> {
-        return message.reply("Under construction!");
+        const typeArgument: ResultType<string> = await args.restResult("string");
+
+        if (typeArgument.isErr()) {
+            throw new UserError({
+                identifier: IxveriaIdentifiers.ArgsMissing,
+                message: "You didn't provide any type of blacklist to list!",
+            });
+        }
+
+        const type = typeArgument.unwrap() as BlacklistType;
+
+        if (!this.#types.includes(type)) {
+            throw new UserError({
+                identifier: IxveriaIdentifiers.InvalidArgumentProvided,
+                message: `Invalid blacklist type provided. Valid types are: ${this.#types.join(", ")}`,
+            });
+        }
+
+        const idArgument: ResultType<string> = await args.restResult("string");
+
+        if (idArgument.isErr()) {
+            throw new UserError({
+                identifier: IxveriaIdentifiers.ArgsMissing,
+                message: "You didn't provide any ID to blacklist!",
+            });
+        }
+
+        const id: string = idArgument.unwrap();
+
+        if (type === "user") {
+            const entity = await this.container.utilities.bot.getUserFromId(id);
+
+            if (!entity) {
+                throw new UserError({
+                    identifier: IxveriaIdentifiers.InvalidArgumentProvided,
+                    message: "Invalid user ID provided!",
+                });
+            }
+
+            await this.container.services.blacklist.create({
+                entityId: entity.id,
+                entityType: "user",
+            });
+        }
+
+        if (type === "guild") {
+            const entity = await this.container.utilities.bot.getGuildFromId(id);
+
+            if (!entity) {
+                throw new UserError({
+                    identifier: IxveriaIdentifiers.InvalidArgumentProvided,
+                    message: "Invalid server ID provided!",
+                });
+            }
+
+            await this.container.services.blacklist.create({
+                entityId: entity.id,
+                entityType: "guild",
+            });
+        }
+
+        return message.reply("Successfully blacklisted the entity!");
     }
 
     /* -------------------------------------------------------------------------- */

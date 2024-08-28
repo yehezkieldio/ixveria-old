@@ -52,6 +52,7 @@ export const guildSettingsRelations = relations(guildSettings, ({ one }) => ({
 /* -------------------------------------------------------------------------- */
 
 export const blacklistTypes = pgEnum("blacklist_types", ["user", "guild"]);
+export type BlacklistType = (typeof blacklistTypes.enumValues)[number];
 
 export const blacklistEntities = pgTable(
     "blacklist_entity",

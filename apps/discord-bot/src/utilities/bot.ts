@@ -57,4 +57,22 @@ export class BotUtilities extends Utility {
     public getUserAsGuildMember = async (userId: string, guild: Guild) => {
         return guild?.members.cache.get(userId) ?? guild?.members.fetch(userId);
     };
+
+    /**
+     * Get a user from their ID.
+     * @param userId The user ID to get.
+     * @returns The user.
+     */
+    public getUserFromId = async (userId: string) => {
+        return await this.container.client.users.fetch(userId);
+    };
+
+    /**
+     * Get a guild from its ID.
+     * @param guildId The guild ID to get.
+     * @returns The guild.
+     */
+    public getGuildFromId = async (guildId: string) => {
+        return await this.container.client.guilds.fetch(guildId);
+    };
 }
