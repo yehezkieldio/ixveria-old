@@ -1,0 +1,14 @@
+{
+    "name": "@ixveria/aggregator-client",
+    "version": "0.0.0",
+    "dependencies": {
+        "@ixveria/aggregator": "workspace:*",
+        "@ixveria/environment": "workspace:*",
+        "@elysiajs/eden": "^1.1.2"
+    },
+    "devDependencies": {
+        "@ixveria/typescript": "workspace:*",
+        "@types/bun": "latest",
+        "typescript": "^5"
+    }
+}

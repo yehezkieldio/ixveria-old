@@ -19,5 +19,11 @@
         "@types/bun": "latest",
         "tsup": "^8.2.4",
         "typescript": "^5"
+    },
+    "exports": {
+        ".": "./src/main.ts"
+    },
+    "imports": {
+        "#random/*": "./src/random/*.ts"
     }
 }

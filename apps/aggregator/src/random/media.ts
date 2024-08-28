@@ -1,13 +1,11 @@
 import { FetchResultTypes, fetch } from "@sapphire/fetch";
 import Elysia from "elysia";
 
-const mediaModule = new Elysia({ name: "Module.Random.Media" });
-
 type CatAsService = {
     _id: string;
 };
 
-mediaModule.group("/media", (app) =>
+const mediaModule = new Elysia({ name: "Module.Random.Media" }).group("/media", (app) =>
     app.get(
         "/cat",
         async ({ set }) => {

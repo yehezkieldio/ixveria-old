@@ -1,29 +1,31 @@
-import { swagger } from "@elysiajs/swagger";
+import swagger from "@elysiajs/swagger";
 import { env } from "@ixveria/environment";
-import { Elysia } from "elysia";
-import mediaModule from "./random/media";
+import Elysia from "elysia";
+import mediaModule from "#random/media";
 
-const api = new Elysia();
-
-api.use(
-    swagger({
-        documentation: {
-            info: {
-                title: "Ixveria Aggregator",
-                version: "0.0.0",
-                description: "An aggregator for various APIs by providing a unified endpoint.",
-            },
-            tags: [
-                {
-                    name: "Media",
-                    description: "Endpoints that aggregate random media, such as random cat images.",
+const aggregator = new Elysia()
+    .use(
+        swagger({
+            documentation: {
+                info: {
+                    title: "Ixveria Aggregator",
+                    version: "0.0.0",
+                    description: "An aggregator for various APIs by providing a unified endpoint.",
                 },
-            ],
-        },
-    }),
-);
-api.use(mediaModule);
+                tags: [
+                    {
+                        name: "Media",
+                        description: "Endpoints that aggregate random media, such as random cat images.",
+                    },
+                ],
+            },
+        }),
+    )
+    .use(mediaModule)
+    .listen({
+        development: env.NODE_ENV === "development",
+        port: env.AGGREGATOR_PORT,
+        hostname: env.AGGREGATOR_HOST,
+    });
 
-api.listen(env.AGGREGATOR_PORT, () => {
-    console.log(`Aggregator listening on port ${env.AGGREGATOR_PORT}`);
-});
+export type Aggregator = typeof aggregator;

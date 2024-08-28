@@ -1,0 +1,5 @@
+{
+    "extends": "@ixveria/typescript/base.json",
+    "include": ["**/*.ts", "../../packages/typescript/reset.d.ts"],
+    "exclude": ["node_modules", "dist"]
+}
